@@ -1,12 +1,11 @@
 plugins {
     id("multiloader-base")
     id("java-library")
-
     id("net.fabricmc.fabric-loom") version ("1.15.4")
 }
 
 base {
-    archivesName = "sodium-common"
+    archivesName = "sodium-mali-g52"
 }
 
 val configurationPreLaunch = configurations.create("preLaunchDeps") {
@@ -45,16 +44,11 @@ repositories {
 }
 
 dependencies {
-    minecraft(group = "com.mojang", name = "minecraft", version = BuildConfig.MINECRAFT_VERSION)
-
+    minecraft(group = "com.mojang", name = "minecraft", version = "1.21.1")
     compileOnly("io.github.llamalad7:mixinextras-common:0.5.0")
     annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0")
-
     compileOnly("net.fabricmc:sponge-mixin:0.13.2+mixin.0.8.5")
-    compileOnly("net.fabricmc:fabric-loader:${BuildConfig.FABRIC_LOADER_VERSION}")
-
-    // We need to be careful during pre-launch that we don't touch any Minecraft classes, since other mods
-    // will not yet have an opportunity to apply transformations.
+    compileOnly("net.fabricmc:fabric-loader:0.15.11")
     configurationPreLaunch("org.lwjgl:lwjgl:3.4.1")
     configurationPreLaunch("org.lwjgl:lwjgl-opengl:3.4.1")
     configurationPreLaunch("org.lwjgl:lwjgl-glfw:3.4.1")
@@ -66,66 +60,9 @@ dependencies {
 
 loom {
     accessWidenerPath = file("src/main/resources/sodium-common.accesswidener")
-
     mixin {
         useLegacyMixinAp = false
     }
 }
-
-fun exportSourceSetJava(name: String, sourceSet: SourceSet) {
-    val configuration = configurations.create("${name}Java") {
-        isCanBeResolved = true
-        isCanBeConsumed = true
-    }
-
-    val compileTask = tasks.getByName<JavaCompile>(sourceSet.compileJavaTaskName)
-    artifacts.add(configuration.name, compileTask.destinationDirectory) {
-        builtBy(compileTask)
-    }
-}
-
-fun exportSourceSetSources(name: String, sourceSet: SourceSet) {
-    val configuration = configurations.create("${name}Sources") {
-        isCanBeResolved = true
-        isCanBeConsumed = true
-    }
-
-    val compileTask = tasks.register<Copy>(sourceSet.getTaskName("process", "sources")) {
-        from(sourceSet.allSource)
-        into(file(project.layout.buildDirectory).resolve("sources").resolve(sourceSet.name))
-    }.get()
-    artifacts.add(configuration.name, compileTask.destinationDir) {
-        builtBy(compileTask)
-    }
-}
-
-fun exportSourceSetResources(name: String, sourceSet: SourceSet) {
-    val configuration = configurations.create("${name}Resources") {
-        isCanBeResolved = true
-        isCanBeConsumed = true
-    }
-
-    val compileTask = tasks.getByName<ProcessResources>(sourceSet.processResourcesTaskName)
-    compileTask.apply {
-        exclude("**/README.txt")
-        exclude("/*.accesswidener")
-    }
-
-    artifacts.add(configuration.name, compileTask.destinationDir) {
-        builtBy(compileTask)
-    }
-}
-
-// Exports the compiled output of the source set to the named configuration.
-fun exportSourceSet(name: String, sourceSet: SourceSet) {
-    exportSourceSetJava(name, sourceSet)
-    exportSourceSetSources(name, sourceSet)
-    exportSourceSetResources(name, sourceSet)
-}
-
-exportSourceSet("commonMain", sourceSets["main"])
-exportSourceSet("commonApi", sourceSets["api"])
-exportSourceSet("commonBoot", sourceSets["boot"])
-exportSourceSet("commonDesktop", sourceSets["desktop"])
 
 tasks.jar { enabled = false }
