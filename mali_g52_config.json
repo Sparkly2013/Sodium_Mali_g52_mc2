@@ -1,0 +1,8 @@
+{
+  "device": {"name": "Samsung Galaxy A14", "gpu": "Mali G52", "ram": "4GB", "display": {"resolution": "720x1600", "dpi": 269, "refresh_rate": 90}, "cpu": "Helio G88"},
+  "mali_configuration": {"tile_size": {"width": 16, "height": 16}, "texture_units": 16, "max_render_targets": 8, "max_vertex_attributes": 16, "max_varying_vectors": 15},
+  "rendering_settings": {"preferred_format": "OpenGL ES 3.2", "texture_compression": {"primary": "ASTC", "secondary": "ETC2", "fallback": "RGBA8"}, "antialiasing": {"type": "MSAA", "samples": 4}},
+  "performance_presets": {"balanced": {"draw_distance": 12, "chunk_updates_per_frame": 2, "max_batch_size": 128}, "maximum": {"draw_distance": 8, "chunk_updates_per_frame": 1, "max_batch_size": 64}},
+  "memory_management": {"gpu_memory_pool": "2048MB", "vertex_buffer_pool": "512MB", "texture_cache_size": "256MB"},
+  "amethyst_launcher_compatibility": {"enabled": true}
+}
